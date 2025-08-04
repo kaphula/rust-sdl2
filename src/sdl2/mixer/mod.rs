@@ -334,15 +334,37 @@ impl Chunk {
         unsafe { mixer::Mix_VolumeChunk(self.raw, -1) as i32 }
     }
 
-
-   pub fn get_length_as_seconds(&self, audio_format: AudioFormat, audio_channels: i32, frequency: i32) -> f32 {
-      let bits_per_sample = (audio_format & sys::SDL_AUDIO_MASK_BITSIZE as u16) as i32;
-      let bytes_per_sample = audio_channels * (bits_per_sample / 8);
-      unsafe {
-         return (*self.raw).alen as f32 / (frequency as f32 * bytes_per_sample as f32)
-      }
-   }
-   
+    /// Calculates the length of an audio chunk in seconds.
+    ///
+    ///
+    /// Use the same [audio_format], [audio_channels] and [frequency] as arguments
+    /// that were used to open the audio device:
+    ///
+    /// ```rust
+    ///
+    /// let frequency = 44_100;
+    /// let format = sdl2::mixer::AUDIO_S16LSB;
+    /// let channels = sdl2::mixer::DEFAULT_CHANNELS;
+    /// let chunk_size = 1_024;
+    /// sdl2::mixer::open_audio(frequency, format, channels, chunk_size)?;
+    ///
+    /// // ...
+    ///
+    /// let chunk = sdl2::mixer::Chunk::from_file("sound.wav").unwrap();
+    /// let chunk_len_in_secs = chunk.get_length_as_seconds(format, channels, frequency);
+    /// print!("Chunk len in seconds: {}", chunk_len_in_secs);
+    /// ```
+    ///
+    pub fn get_length_as_seconds(
+        &self,
+        audio_format: AudioFormat,
+        audio_channels: i32,
+        frequency: i32,
+    ) -> f32 {
+        let bits_per_sample = (audio_format & sys::SDL_AUDIO_MASK_BITSIZE as u16) as i32;
+        let bytes_per_sample = audio_channels * (bits_per_sample / 8);
+        unsafe { return (*self.raw).alen as f32 / (frequency as f32 * bytes_per_sample as f32) }
+    }
 }
 
 /// Loader trait for `RWops`
