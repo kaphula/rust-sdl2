@@ -333,6 +333,16 @@ impl Chunk {
     pub fn get_volume(&self) -> i32 {
         unsafe { mixer::Mix_VolumeChunk(self.raw, -1) as i32 }
     }
+
+
+   pub fn get_length_as_seconds(&self, audio_format: AudioFormat, audio_channels: i32, frequency: i32) -> f32 {
+      let bits_per_sample = (audio_format & sys::SDL_AUDIO_MASK_BITSIZE as u16) as i32;
+      let bytes_per_sample = audio_channels * (bits_per_sample / 8);
+      unsafe {
+         return (*self.raw).alen as f32 / (frequency as f32 * bytes_per_sample as f32)
+      }
+   }
+   
 }
 
 /// Loader trait for `RWops`
