@@ -88,6 +88,10 @@ fn demo(music_file: &Path, sound_file: Option<&Path>) -> Result<(), String> {
         };
 
         println!("chunk volume => {:?}", sound_chunk.get_volume());
+        println!(
+            "chunk length in seconds => {:?}",
+            sound_chunk.get_length_as_seconds(format, channels, frequency)
+        );
         println!("playing sound twice");
         sdl2::mixer::Channel::all().play(&sound_chunk, 1)?;
 
