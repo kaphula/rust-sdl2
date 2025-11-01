@@ -591,17 +591,37 @@ impl Channel {
         }
     }
 
+   /// Get the most recent sample chunk pointer played on channel.
+   pub fn is_chunk_playing_on_channel(self, other: &Chunk) -> bool {
+      let Channel(ch) = self;
+      let raw = unsafe { mixer::Mix_GetChunk(ch as c_int) };
+      if raw.is_null() {
+         return false
+      } else {
+         if other.raw == raw {
+            if self.is_playing() {
+               return true;
+
+            }
+         }
+      }
+      false
+   }
+
+
+   // too dangerous and broken, calls automatic drop on the returned chunk when it goes out of scope
+/*
     /// Get the most recent sample chunk pointer played on channel.
-    pub fn get_chunk(self) -> Option<Chunk> {
+      pub fn get_chunk(self) -> Option<Chunk> {
         let Channel(ch) = self;
         let raw = unsafe { mixer::Mix_GetChunk(ch as c_int) };
         if raw.is_null() {
             None
         } else {
-            Some(Chunk { raw, owned: false })
+            Some(Chunk { raw, owned: true })
         }
     }
-
+*/
     /// This removes all effects registered to channel.
     pub fn unregister_all_effects(self) -> Result<(), String> {
         let Channel(ch) = self;
